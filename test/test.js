@@ -763,6 +763,117 @@ QUnit.test('module timings', function(assert) { "use strict";
 
 });
 
+QUnit.test('dependency tree', function(assert) { "use strict";
+  assert.expect(2);
+
+  var counts = {};
+  
+  define('9-a/i', function() {
+    counts['9-a/i'] = counts['9-a/i']  || 0;
+    ++counts['9-a/i'];
+    return '9-a/i';
+  });
+  
+  require('9-a/i'); // resolve this module for later use
+
+  define('9-a/j', [
+    '9-a/k'
+  ], function() {
+    counts['9-a/j'] = counts['9-a/j']  || 0;
+    ++counts['9-a/j'];
+    return Array.prototype.join.call(arguments,':');
+  });
+  
+  define('9-a/k', function() {
+    counts['9-a/k'] = counts['9-a/k']  || 0;
+    ++counts['9-a/k'];
+    return '9-a/k';
+  }); 
+  
+  require('9-a/j'); // resolve this module for later use
+
+  define('9-a/b', [
+    '9-a/c', // has identical dependencies as 9-a/d, expressed differently
+    '9-a/d', // has identical dependencies as 9-a/c, expressed differently, so shouldn't have to traverse this dependency sub-tree
+    '9-a/e',
+    '9-a/f'  // all its dependencies are already resolved, so should not have to traverse down
+  ], function() {
+    counts['9-a/b'] = counts['9-a/b']  || 0;
+    ++counts['9-a/b'];
+    return Array.prototype.join.call(arguments,':');
+  });
+
+  // has identical dependencies as 9-a/d, expressed differently
+  define('9-a/c', [
+    './g',
+    '9-a/h'
+  ], function() {
+    counts['9-a/c'] = counts['9-a/c']  || 0;
+    ++counts['9-a/c'];
+    return Array.prototype.join.call(arguments,':');
+  });
+
+  // has identical dependencies as 9-a/c, expressed differently
+  define('9-a/d', [
+    '9-a/g',
+    './h'
+  ], function() {
+    counts['9-a/d'] = counts['9-a/d']  || 0;
+    ++counts['9-a/d'];
+    return Array.prototype.join.call(arguments,':');
+  });
+
+  define('9-a/e', function() {
+    counts['9-a/e'] = counts['9-a/e']  || 0;
+    ++counts['9-a/e'];
+    return '9-a/e';
+  });
+
+  // all its dependencies are already resolved, so should not have to traverse down
+  define('9-a/f', [
+    '9-a/i',
+    'module',
+    '9-a/j',
+    'exports'
+  ], function(
+    dep0,
+    dep1,
+    dep2,
+    dep3
+  ) {
+    counts['9-a/f'] = counts['9-a/f']  || 0;
+    ++counts['9-a/f'];
+    return dep0 + ':' + dep2;
+  });
+  
+  define('9-a/g', function() {
+    counts['9-a/g'] = counts['9-a/g']  || 0;
+    ++counts['9-a/g'];
+    return '9-a/g';
+  });
+  
+  define('9-a/h', function() {
+    counts['9-a/h'] = counts['9-a/h']  || 0;
+    ++counts['9-a/h'];
+    return '9-a/h';
+  });
+
+  assert.strictEqual(require('9-a/b'), '9-a/g:9-a/h:9-a/g:9-a/h:9-a/e:9-a/i:9-a/k', 'dependency tree is traversed and values returned');
+  assert.deepEqual(counts, {
+    "9-a/b" : 1,
+    "9-a/c" : 1,
+    "9-a/d" : 1,
+    "9-a/e" : 1,
+    "9-a/f" : 1,
+    "9-a/g" : 1,
+    "9-a/h" : 1,
+    "9-a/i" : 1,
+    "9-a/j" : 1,
+    "9-a/k" : 1
+  }, 'all factory functions only executed once');
+
+});
+
 QUnit.test('ready.toUrl()', function(assert) { "use strict";
   assert.expect(6);
 
