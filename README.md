@@ -28,7 +28,7 @@ athena/require does expose a `require.toUrl()` method, but it is a minimal imple
 
 ### module timing
 
-By default, athena/require records the time it takes to execute each module's factory function. The timings are exposed by the `require.getModuleTimes()` method, as an object in the form of:
+By default, athena/require records the time it takes to execute each module's factory function. The timings are exposed by the `require.getTimes()` method, as an object in the form of:
 
     {
       "totalModuleTime"      : total time spent executing factory functions in milliseconds,
