@@ -190,7 +190,7 @@ function _define() {
     throw new Error('Invalid arguments.');  
   }
 
-  if (_moduleMap[moduleName]) {
+  if (_moduleMap.hasOwnProperty(moduleName)) {
       _warn(moduleName + ' is already defined.');
   }
   else {
