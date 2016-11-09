@@ -332,11 +332,14 @@ function _onLoad(callback) {
 
   _onLoadCallbacks.unshift(callback);
 
-  // If we are oddly in a situation where there is no document (like we're not a
-  // browser?), just flush the callbacks immediately. If the document is already
-  // complete, flush the callbacks.
-  if (!_root.document || _root.document.readyState === 'complete') {
+  // If the document is already complete, flush the callbacks.
+  if (_root.document &&  _root.document.readyState === 'complete') {
     flushOnLoadCallbacks();
+  }
+  // If we are oddly in a situation where there is no document (like we're not a
+  // browser?), just flush the callbacks on defer.
+  else if (!_root.document) {
+    setTimeout(flushOnLoadCallbacks, 0);
   }
 
 }
