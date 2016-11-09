@@ -391,12 +391,19 @@ function _require() {
         }
       });
 
+      // If the tree is resolved immediately or will be resolved later, return true
+      // to move on to the next item in the callback queue.
       if (resolveStatus.success || resolveStatus.deferred) {
         return true;
       }
+      // If all modules have been defined and we can't find the one we're looking
+      // for, throw an error.
       else if (_isReady && resolveStatus.moduleNotFound) {
         _throwResolveError(resolveStatus);
       }
+      // If all modules have not yet been defined, and the resolve status is
+      // something other than success or deferred, return false to put this
+      // callback back into the queue, to be tried again later.
       else {
         return false;
       }
