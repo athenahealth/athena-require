@@ -522,7 +522,7 @@ QUnit.test('plugins', function(assert) { "use strict";
     };
   });
 
-  assert.throws(function() {
+  assert.raises(function() {
     require('4-w');
   }, /4-plugin-6!4-x is not yet ready/, 'bar');
 
