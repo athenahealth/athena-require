@@ -266,7 +266,7 @@ QUnit.test('relative paths', function(assert) { "use strict";
 QUnit.test('plugins', function(assert) { "use strict";
   assert.expect(28);
 
-  assert.throws(function() {
+  assert.raises(function() {
     require('4-plugin-bogus!z');
   }, /4-plugin-bogus or one of its dependencies is not (yet )?defined./, 'undefined plugin throws an error');
 
