@@ -16,7 +16,7 @@ athena/require supports:
 
 * synchronous and asynchronous forms of `require` and `requirejs`
 * named module definitions
-* depenendencies with relative IDs
+* dependencies with relative IDs
 * plugins which do not rely on dynamic loading of resources (plugins which call `require` to load resources that have already been inlined are supported, as are plugins that dynamically load resources through other means, such as raw AJAX)
 * 'module', 'exports', and 'require' pseudo-dependencies
 
