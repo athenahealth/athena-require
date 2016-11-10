@@ -21,7 +21,7 @@ QUnit.test('simple module, synchronous require', function(assert) { "use strict"
   assert.strictEqual(require('0-a'), m, 'strictly the same value is always returned for a module');
   assert.strictEqual(count, 1, 'factory function does not run more than once');
 
-  assert.throws(function() {
+  assert.raises(function() {
     require('0-bogus');
   }, /Module 0-bogus or one of its dependencies is not (yet )?defined./, 'undefined module throws an error');
 });
