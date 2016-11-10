@@ -398,7 +398,7 @@ function _require() {
       }
       // If all modules have been defined and we can't find the one we're looking
       // for, throw an error.
-      else if (_isReady && resolveStatus.moduleNotFound) {
+      else if (_isReady && resolveStatus.moduleNotDefined) {
         _throwResolveError(resolveStatus);
       }
       // If all modules have not yet been defined, and the resolve status is
@@ -432,8 +432,8 @@ function _require() {
 // {
 //   success: true if resolution was a complete and immediate success,
 //
-//   moduleNotFound: set to the full path of a module which has not (yet) been
-//                   defined,
+//   moduleNotDefined: set to the full path of a module which has not (yet) been
+//                     defined,
 //
 //   deferred: set to the full path of a dependency which could not be 
 //             immediately resolved. dependency tree resolution will 
