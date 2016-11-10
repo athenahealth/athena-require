@@ -642,12 +642,12 @@ QUnit.test('require, module and exports', function(assert) {
     module
   ) {});
 
-  var result5J1 = require('5-l');
-  var result5J2 = require('5-l');
-  var result5K = require('5-m');
+  var result5L1 = require('5-l');
+  var result5L2 = require('5-l');
+  var result5M = require('5-m');
 
-  assert.strictEqual(result5J2, result5J1, 'module which uses module (module.exports) always returns reference to the same object');
-  assert.notStrictEqual(result5K, result5J1, 'different modules which use module (module.exports) return references to different objects');
+  assert.strictEqual(result5L2, result5L1, 'module which uses module (module.exports) always returns reference to the same object');
+  assert.notStrictEqual(result5M, result5L1, 'different modules which use module (module.exports) return references to different objects');
 });
 
 QUnit.test('require.ready()', function(assert) { "use strict";
