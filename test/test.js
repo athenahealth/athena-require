@@ -145,7 +145,7 @@ QUnit.test('relative paths', function(assert) { "use strict";
 
   define('3-f/g/h', [
     './d',
-    '../e',
+    '../e'
   ], function(
     dep0,
     dep1
