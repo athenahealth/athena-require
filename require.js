@@ -81,13 +81,13 @@ var _resolvedModuleCount = 0;
 //  modules: {
 //    'my/module' : {
 //      ordering: in what order this module was resolved
-//      time: number of millisconds spend resolving this module and its
+//      time: number of millisconds spent resolving this module and its
 //                 dependencies
 //    },
 //    'my/other/module' : { ... },
 //    ...
 //  }
-//  totalModuleTime: total time spend resolving in milliseconds,
+//  totalModuleTime: total time spent resolving in milliseconds,
 //  totalNumberOfModules: total number of modules whose times are reflected in totalModuleTime
 // }
 var _moduleTimes = {
@@ -97,8 +97,9 @@ var _moduleTimes = {
 };
 
 // Given a string that looks like a path to the module, returns the portion
-// of the path that represents the 'current directory'. For example, given
-// 'path/to/some/module', returns 'path/to/some'. Given 'myModule', returns
+// of the path that represents the 'directory' that contains the module. For 
+// example, given 'path/to/some/module', returns 'path/to/some'. Given 
+// 'my-module', returns an empty string
 var _dirName = (function() {
   var cache = {};
 
@@ -124,7 +125,7 @@ function _config(args) {
   if (args) {
     for (var key in args) {
       if (args.hasOwnProperty(key)) {
-          _configuration[key] = args[key];
+         _configuration[key] = args[key];
       }
     }
   }
@@ -135,7 +136,7 @@ function _config(args) {
 // Given a module name, a list of dependencies, and a factory function,
 // defines the module as such.
 function _define() {
-  var anonymousWarning = 'Encountered anonymously defined  module. Modules must be properly compiled into named modules. Proceeding without defining this module.';
+  var anonymousWarning = 'Encountered anonymously defined module. Modules must be properly compiled into named modules. Proceeding without defining this module.';
   var moduleName;
   var dependencies;
   var factory;
@@ -224,7 +225,7 @@ function _flushNextTickCallbacks() {
 
 // in the form of:
 // {
-//   totalModuleTime: total time in millisecond spent building modules,
+//   totalModuleTime: total time in milliseconds spent building modules,
 //   totalNumberOfModules: total number of modules built,
 //   modules: {
 //     'my/module' : {
@@ -241,7 +242,7 @@ function _getModuleTimes() {
 }
 
 // If _root.performance is available, returns the time since epoch to microsecond
-// acuracy. Otherwise, returns the time since epoch to millisecond accuracy,
+// precision. Otherwise, returns the time since epoch to millisecond accuracy,
 // with no guarantee of monotonicity.
 var _getNow = (_root.performance && _root.performance.now 
   ? _root.performance.now.bind(_root.performance)
@@ -423,7 +424,7 @@ function _require() {
 //                have _resolveTree continue resolving a dependency tree given
 //                the state of the stack.
 //
-//  onSuccess: a function to execute when the dependency tree has been successfuly
+//  onSuccess: a function to execute when the dependency tree has been successfully
 //             resolved.
 //
 // }
