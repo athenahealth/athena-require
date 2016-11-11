@@ -311,17 +311,17 @@ function _onLoad(callback) {
   if (
     !_onLoadCallbacks.length // If we have onLoad callbacks queued, it means that
                              // we've already called _onLoad before the document
-			     // was complete, which means that we already have
-			     // the load handlers attached to flush the call backs,
-			     // so we don't need to attach the load handlers again.
+                             // was complete, which means that we already have
+                             // the load handlers attached to flush the call backs,
+                             // so we don't need to attach the load handlers again.
     
     && _root.document // Attaching load handlers only really makes sense where
                       // we are in a browser context with a document.
 
     && _root.document.readyState !== 'complete' // Don't bother attaching load
                                                 // handlers if the document is
-						// already complete, because
-						// they'll never fire.
+                                                // already complete, because
+                                                // they'll never fire.
   ) {
     if (_root.addEventListener) {
       _root.addEventListener('load', flushOnLoadCallbacks);
@@ -553,7 +553,7 @@ function _resolveTree(args) {
         // retrieve it and continue.
         if (pluginStatus.success) {
           plugin = _resolved[pluginPath];
-	}
+        }
         // Otherwise, we'll have to pause resolving until later.
         else {
           return pluginStatus;
@@ -667,7 +667,8 @@ function _resolveTree(args) {
           currentNode.resolvedDependencies[i] = currentNode.exports;
           ++currentNode.numberOfResolvedDependencies;
         }
-        // Inject meta information about the module, which includes 
+        // Inject meta information about the module, which includes
+        // module id and exports
         else if (dependencyString === 'module') {
 
           // Ditto.
@@ -712,20 +713,20 @@ function _resolveTree(args) {
       // Only resolve the module once.
       if (!_resolved.hasOwnProperty(fullModulePath)) {
         var startTime = _getNow();
-	_resolved[fullModulePath]= currentNode.factory.apply(_root, currentNode.resolvedDependencies);
+        _resolved[fullModulePath]= currentNode.factory.apply(_root, currentNode.resolvedDependencies);
         var moduleTime = (_getNow() - startTime);
-	++_resolvedModuleCount;
+        ++_resolvedModuleCount;
 
-	if (_configuration.recordModuleTimes) {
+        if (_configuration.recordModuleTimes) {
           _moduleTimes.totalModuleTime += moduleTime;
-	  ++_moduleTimes.totalNumberOfModules;
+          ++_moduleTimes.totalNumberOfModules;
 
-	  if (moduleTime > _configuration.recordModuleTimeThreshold) {
+          if (moduleTime > _configuration.recordModuleTimeThreshold) {
             _moduleTimes.modules[fullModulePath] = {
-	      time: moduleTime,
-	      ordering: _resolvedModuleCount
-	    };
-	  }
+              time: moduleTime,
+              ordering: _resolvedModuleCount
+            };
+          }
         }
 
         // Apply the CommonJS style exports only if there is no return from the factory.
