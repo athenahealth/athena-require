@@ -752,7 +752,7 @@ function _resolveTree(args) {
     if (++numberOfTraversedNodes > MAX_TRAVERSAL) {
       throw new Error(
         'Traversed too many nodes in the dependency tree. Possible cycle at ' 
-        + (currentNodecurrentNode.fullModulePath || currentNodecurrentNode.modulePath)
+        + (currentNode.fullModulePath || currentNode.modulePath)
       );
     }    
   }

@@ -874,6 +874,28 @@ QUnit.test('dependency tree', function(assert) { "use strict";
 
 });
 
+QUnit.test('dependency loops', function(assert) {
+  assert.expect(2);
+
+  define('10-a', ['10-b'], function() { return {}; });
+  define('10-b', ['10-c'], function() { return {}; });
+  define('10-c', ['10-a'], function() { return {}; });
+
+  assert.raises(function(){
+    require('10-a');
+  }, /Traversed too many nodes in the dependency tree. Possible cycle at /, 'dependency loop throws error');
+
+  define('10-d', function() { return {}; });
+  define('10-e', ['10-d', '10-f'], function() { return {}; });
+  define('10-f', ['10-g'], function() { return {}; });
+  define('10-g', ['10-e'], function() { return {}; });
+
+  assert.raises(function(){
+    require('10-e');
+  }, /Traversed too many nodes in the dependency tree. Possible cycle at /, 'dependency loop with other dependencies throws error');
+
+});
+
 QUnit.test('ready.toUrl()', function(assert) { "use strict";
   assert.expect(6);
 
