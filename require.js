@@ -474,6 +474,9 @@ function _resolveTree(args) {
     // ! indicates the invocation of a plugin.
     var bangIndex;
 
+    // Will be true if currentNode.modulePath is an exact match for an entry in _moduleMap.
+    var modulePathIsExactMatch;
+
     // If the given module path matches exactly to a resolved module, we can
     // assume it is a full module path, and skip the work of resolving.
     if (_resolved.hasOwnProperty(currentNode.modulePath)) {
@@ -494,7 +497,8 @@ function _resolveTree(args) {
     }
     // if ordinary module dependency (i.e., not a plugin invocation)
     else if (
-      _moduleMap.hasOwnProperty(currentNode.modulePath)
+      // Track if the modulePath happens to be an exact match in _moduleMap
+      (modulePathIsExactMatch = _moduleMap.hasOwnProperty(currentNode.modulePath))
 
       // If modulePath is in the _moduleMap, definitely not a plugin invocation,
       // so short circuit and don't bother checking for bangIndex.
@@ -502,7 +506,10 @@ function _resolveTree(args) {
     ) {
       // Normalize the module path to its full module path. We will from now on
       // only be referring to the module by its full path.
-      if (currentNode.modulePath.charAt(0) === '.') {
+      
+      // Don't bother checking to see if we need to normalize the module path
+      // if the module path is an exact match for a module definition.
+      if (!modulePathIsExactMatch && currentNode.modulePath.charAt(0) === '.') {
         currentNode.fullModulePath = _normalizeModulePath(currentNode.modulePath, currentNode.parentNode ? currentNode.parentNode.fullModulePath : '');
       }
       else {
