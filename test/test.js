@@ -653,7 +653,7 @@ QUnit.test('require, module and exports', function(assert) {
 
   var fnN = function() { return 'n'; };
   define('5-n', [
-    'module',
+    'module'
   ], function(
     module
   ) {
@@ -679,7 +679,7 @@ QUnit.test('require, module and exports', function(assert) {
   var fnP = function() { return 'p'; };
 
   define('5-p', [
-    'module',
+    'module'
   ], function(
     module
   ) {
