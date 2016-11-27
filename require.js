@@ -468,6 +468,11 @@ function _resolveTree(args) {
 
   var numberOfTraversedNodes = 0;
 
+  // This is a pretty long loop block, and one might expect such a long block of
+  // code to be broken up into smaller functions, but the intent here is to keep
+  // as much code inline as possible (while staying reasonably DRY), in order to
+  // maximize performance.
+
   // Keep traversing while we still have nodes to traverse.
   while (currentNode = resolveStack.pop()) {
 
