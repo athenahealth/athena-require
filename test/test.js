@@ -970,7 +970,7 @@ QUnit.test('dependency loops', function(assert) {
 
   assert.raises(function(){
     require('10-a');
-  }, /Traversed too many nodes in the dependency tree. Possible cycle at /, 'dependency loop throws error');
+  }, /Traversed too many nodes in the dependency tree. Possible cycle at module .+ or at a related module\./, 'dependency loop throws error');
 
   define('10-d', function() { return {}; });
   define('10-e', ['10-d', '10-f'], function() { return {}; });
@@ -979,7 +979,7 @@ QUnit.test('dependency loops', function(assert) {
 
   assert.raises(function(){
     require('10-e');
-  }, /Traversed too many nodes in the dependency tree. Possible cycle at /, 'dependency loop with other dependencies throws error');
+  }, /Traversed too many nodes in the dependency tree. Possible cycle at module .+ or at a related module\./, 'dependency loop with other dependencies throws error');
 
 });
 
