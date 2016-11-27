@@ -529,7 +529,7 @@ QUnit.test('plugins', function(assert) { "use strict";
 });
 
 QUnit.test('require, module and exports', function(assert) {
-  assert.expect(14);
+  assert.expect(22);
 
   define('5-a/b/c', [
     '5-a/b/d',
@@ -648,6 +648,93 @@ QUnit.test('require, module and exports', function(assert) {
 
   assert.strictEqual(result5L2, result5L1, 'module which uses module (module.exports) always returns reference to the same object');
   assert.notStrictEqual(result5M, result5L1, 'different modules which use module (module.exports) return references to different objects');
+
+  /**********/
+
+  var fnN = function() { return 'n'; };
+  define('5-n', [
+    'module',
+  ], function(
+    module
+  ) {
+    module.exports =  fnN;
+  });
+
+  assert.strictEqual(require('5-n'), fnN, 'module.exports can be wholly assigned to a value');
+
+  var fnO = function() { return 'o'; };
+  define('5-o', [
+    'module',
+    'exports'
+  ], function(
+    module,
+    exports
+  ) {
+    module.exports = fnO;
+    exports.shouldNotBeExported = 'fooO';
+  });
+
+  assert.strictEqual(require('5-o'), fnO, 'reassigned module.exports is used, even if exports is modified')
+
+  var fnP = function() { return 'p'; };
+
+  define('5-p', [
+    'module',
+  ], function(
+    module
+  ) {
+    module.exports =  fnP;
+    return { correctReturn: true };
+  });
+
+  assert.deepEqual(require('5-p'), { correctReturn: true }, 'if module returns a value, reassigned module.exports is not used');
+
+  /*******/
+
+  define('5-r', [
+    'module'
+  ], function(
+    module
+  ) {
+    module.exports.shouldNotBeExported = 'badValue';
+    return false;
+  });
+
+  assert.strictEqual(require('5-r'), false, 'if module returns strictly false, module is strictly false, even if module.exports is used');
+
+  define('5-s', [
+    'exports'
+  ], function(
+    exports
+  ) {
+    exports.shouldNotBeExported = 'badValue';
+    return false;
+  });
+
+  assert.strictEqual(require('5-s'), false, 'if module returns strictly false, module is strictly false, even if exports is used');
+
+  define('5-t', [
+    'module'
+  ], function(
+    module
+  ) {
+    module.exports = 'badValue';
+    return false;
+  });
+
+  assert.strictEqual(require('5-t'), false, 'if module returns strictly false, module is strictly false, even if module.exports is used and reassigned');
+
+  define('5-u', [
+    'module'
+  ], function() {});
+
+  assert.deepEqual(require('5-u'), {}, 'when module is used but module.exports is untouched, module is {}');
+
+  define('5-v', [
+    'exports'
+  ], function() {});
+
+  assert.deepEqual(require('5-v'), {}, 'when exports is used, but is untouched, module is {}');
 });
 
 QUnit.test('require.ready()', function(assert) { "use strict";

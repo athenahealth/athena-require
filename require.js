@@ -664,29 +664,21 @@ function _resolveTree(args) {
           ++currentNode.numberOfResolvedDependencies;
         }
         // CommonJS style exports.
-        else if (dependencyString === 'exports') {
-
-          // If the dependency list contains both 'exports', and 'module',
-          // which contains a reference to an export object, be sure that
-          // both references reference the same object.
-          currentNode.exports = currentNode.exports || {};
-
-          currentNode.resolvedDependencies[i] = currentNode.exports;
-          ++currentNode.numberOfResolvedDependencies;
-        }
-        // Inject meta information about the module, which includes
-        // module id and exports
-        else if (dependencyString === 'module') {
-
-          // Ditto.
-          currentNode.exports = currentNode.exports || {};
-
-          // Meta info about the module includes its id, and a
-          // CommonJS style exports object.
-          currentNode.resolvedDependencies[i] = {
+        else if (
+          dependencyString === 'module'
+          || dependencyString === 'exports'
+        ) {
+          
+          currentNode.commonJS = currentNode.commonJS || {
             id: currentNode.fullModulePath,
-            exports: currentNode.exports
+            exports: {} 
           };
+
+          currentNode.resolvedDependencies[i] = (dependencyString === 'module'
+            ? currentNode.commonJS
+            : currentNode.commonJS.exports
+          );
+
           ++currentNode.numberOfResolvedDependencies;
         }
         // Else, the dependency may or may not be resolved already.
@@ -737,8 +729,8 @@ function _resolveTree(args) {
         }
 
         // Apply the CommonJS style exports only if there is no return from the factory.
-        if ((typeof _resolved[fullModulePath]) === 'undefined' && currentNode.exports) {
-          _resolved[fullModulePath] = currentNode.exports;
+        if ((typeof _resolved[fullModulePath]) === 'undefined' && currentNode.commonJS) {
+          _resolved[fullModulePath] = currentNode.commonJS.exports;
         }
       }
 
