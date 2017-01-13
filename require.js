@@ -31,7 +31,14 @@ if (_root.define || _root.requirejs) {
 var MAX_TRAVERSAL = 1000000;
 
 var _configuration = {
+  delayBetweenRequireCallbacks: undefined, // If set, the delay in milliseconds
+                                           // between each require callback.
+
+  onReady: undefined, // If set, called after require is ready
+                      // and has handled all queued callbacks.
+
   recordModuleTimes: true,
+  
   recordModuleTimeThreshold: 5.0, // Record timing for construction time of
                                   // individual module only if the time exceeds
                                   // this many milliseconds. (The individual time
@@ -41,6 +48,12 @@ var _configuration = {
 
 // true if all of the defines on the page have had a chance to execute.
 var _isReady = false;
+
+// true if require is ready and all queued callbacks have finished.
+var _readyCallbacksFinished = false;
+
+// true if require callback handling is in the middle of a delay between callbacks.
+var _flushNextTickCallbacksPaused = false;
 
 // defined modules, in the form of:
 // {
@@ -210,17 +223,46 @@ function _defined(moduleName) {
 
 // Manually and immediately flushes require callbacks waiting to be executed
 function _flushNextTickCallbacks() {
-  while (_nextTickCallbacks.length) {
-    var callback = _nextTickCallbacks.pop();
-    var success = callback();
-    if (!success) {
-      // non-fatal failure. Put back in the queue to be
-      // tried again at the next invocation of
-      // _flushNextTickCallbacks
-      _nextTickCallbacks.push(callback);
-      break;
+  // This function can relinquish control of the JS thread, so
+  // we explicitly disallow multiple simultaneous instances by
+  // preventing new instances from starting while another is
+  // active but in the middle of a delay between callbacks.
+  if (_flushNextTickCallbacksPaused) return;
+
+  (function _flush () {
+    _flushNextTickCallbacksPaused = false;
+    while (_nextTickCallbacks.length) {
+      var callback = _nextTickCallbacks.pop();
+      var success = callback();
+      if (!success) {
+        // non-fatal failure. Put back in the queue to be
+        // tried again at the next invocation of
+        // _flushNextTickCallbacks
+        _nextTickCallbacks.push(callback);
+        return;
+      }
+      
+      // If a require callback delay is configured, relinquish
+      // control of the JS thread and continue later.
+      if (
+        typeof _configuration.delayBetweenRequireCallbacks === 'number'
+        && _nextTickCallbacks.length
+      ) {
+        _flushNextTickCallbacksPaused = true;
+        setTimeout(_flush, _configuration.delayBetweenRequireCallbacks);
+        return;
+      }
     }
-  }
+
+    // If require is ready and all callbacks have been handled,
+    // trigger the onReady callback if applicable.
+    if (_isReady && !_readyCallbacksFinished) {
+      _readyCallbacksFinished = true;
+      if (typeof _configuration.onReady === 'function') {
+        _configuration.onReady.apply(_root);
+      }
+    }
+  })();
 }
 
 // in the form of:
@@ -758,7 +800,7 @@ function _resolveTree(args) {
       throw new Error(
         'Traversed too many nodes in the dependency tree. Possible cycle at module ' 
         + (currentNode.fullModulePath || currentNode.modulePath)
-	+ ' or at a related module.'
+        + ' or at a related module.'
       );
     }    
   }
@@ -824,6 +866,9 @@ function _warn(message) {
     _root.console.warn(message);
   }
 }
+
+// If config options were specified in advance, set them now.
+if (_root && _root.require && typeof _root.require === 'object') _config(require);
 
 // publish our functions
 _root.define = _define;
