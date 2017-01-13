@@ -994,6 +994,18 @@ QUnit.test('require.toUrl()', function(assert) { "use strict";
   assert.strictEqual(require.toUrl('bar/foo.js'), 'bar/foo.js', 'with slash, with js extension');
 });
 
+QUnit.test('require.defined()', function(assert) { "use strict";
+  assert.expect(3);
+
+  define('11-a', {});
+  define('11-b', function() {});
+
+  assert.strictEqual(require.defined('11-a'), true, 'require.defined() returns true for module defined as an object');
+  assert.strictEqual(require.defined('11-b'), true, 'require.defined() returns true for a module defined with a factory function');
+  assert.strictEqual(require.defined('11-c'), false, 'require.defined() returns false for a module not defined');
+
+});
+
 QUnit.test('require.config()', function(assert) { "use strict";
   assert.expect(1);
 

@@ -26,6 +26,10 @@ athena/require does expose a `require.toUrl()` method, but it is a minimal imple
 
 ## Additional features
 
+### defined
+
+`require.defined('some/module')` will return `true` or `false` if `'some/module'` is or is not a defined module respectively.
+
 ### module timing
 
 By default, athena/require records the time it takes to execute each module's factory function. The timings are exposed by the `require.getTimes()` method, as an object in the form of:
