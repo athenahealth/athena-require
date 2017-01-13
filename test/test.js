@@ -983,7 +983,7 @@ QUnit.test('dependency loops', function(assert) {
 
 });
 
-QUnit.test('ready.toUrl()', function(assert) { "use strict";
+QUnit.test('require.toUrl()', function(assert) { "use strict";
   assert.expect(6);
 
   assert.strictEqual(require.toUrl('foo'), 'foo.js', 'no slash, no extension');
@@ -994,7 +994,7 @@ QUnit.test('ready.toUrl()', function(assert) { "use strict";
   assert.strictEqual(require.toUrl('bar/foo.js'), 'bar/foo.js', 'with slash, with js extension');
 });
 
-QUnit.test('ready.config()', function(assert) { "use strict";
+QUnit.test('require.config()', function(assert) { "use strict";
   assert.expect(1);
 
   require.config({ testConfig: true });
