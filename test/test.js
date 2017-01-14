@@ -1006,11 +1006,52 @@ QUnit.test('require.defined()', function(assert) { "use strict";
 
 });
 
-QUnit.test('require.config()', function(assert) { "use strict";
+QUnit.test('delayBetweenRequireCallbacks', function(assert) {
   assert.expect(1);
+  var ready = assert.async();
+
+  define('12-a', {});
+
+  require.config({ delayBetweenRequireCallbacks: 500 });
+
+  var time;
+  var getNow = typeof performance !== 'undefined' && performance.now 
+    ? performance.now.bind(performance)
+    : Date.now.bind(Date)
+  ;
+
+  require(['12-a'], function() {
+    time = getNow();
+  });
+
+  require(['12-a'], function() {
+    assert.ok(getNow() - time >= 500, 'delay occurs before the following callback is called');
+    ready();  
+  });
+
+  require.ready();
+  require.config({ delayBetweenRequireCallbacks: undefined });
+
+});
+
+QUnit.test('onReady', function(assert) { "use strict";
+  assert.expect(2);
+
+  require.ready();
+
+  assert.ok(root.onReadyThis, 'onReady callback is called after ready');
+  assert.ok(root.onReadyThis, root, "this of onReady callback is the root context's this");
+});
+
+QUnit.test('require.config()', function(assert) { "use strict";
+  assert.expect(3);
 
   require.config({ testConfig: true });
   assert.strictEqual(require.config().testConfig, true, 'require.config() sets and retrieves configuration');
+
+  assert.strictEqual(require.config().configObjectTest, 123, 'require uses config object defined as the variable require');
+  require.config({ configObjectTest: 456 });
+  assert.strictEqual(require.config().configObjectTest, 456, 'require.config() can override require config object');
 
 });
 

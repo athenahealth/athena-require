@@ -30,6 +30,10 @@ athena/require does expose a `require.toUrl()` method, but it is a minimal imple
 
 `require.defined('some/module')` will return `true` or `false` if `'some/module'` is or is not a defined module respectively.
 
+### delayBetweenRequireCallbacks
+
+Set the `delayBetweenRequireCallbacks` to a number of milliseconds (`require.config({ delayBetweenRequireCallbacks });`) in order to add that amount of delay between the invocations of the require callbacks. (The delay is achieved via `setTimeout`.)
+
 ### module timing
 
 By default, athena/require records the time it takes to execute each module's factory function. The timings are exposed by the `require.getTimes()` method, as an object in the form of:
@@ -52,11 +56,19 @@ Module timing can be turned off by setting the `recordModuleTimes` config to `fa
 
 When timings are enabled, all factory function times will be added to `totalModuleTime`, and all modules will count towards `totalNumberOfModules`. However, only modules whose factory functions exceed a configured threshold will be recorded individually under `modules`. This threshold can be configured under `recordModuleTimeThreshold` (`require.config({ recordModuleTimeThreshold: thresholdInMilliseconds });`), which defaults to 5.0.
 
+### onReady
+
+Set the `onReady` config to a function (`require.config({ onReady: function() { ... } });`) in order to have it be called after ready (see [ready](#ready)) and the queue of require callbacks are cleared.
+
 ### ready
 
 By default, athena/require will wait until the `load` event of `window` before assuming that all modules that are to be defined have been defined. Before the `load` event, athena/require will attempt to service asynchronous `require` calls, but if an as-of-yet undefined module is encountered in the dependency tree of the required module(s), athena/require will wait all the way until the `load` event before trying again, after which point dependencies on undefined modules will be fatal. This default behavior is conservative; the `load` event signals that all assets on the page have been loaded (and all scripts executed), which means that all calls to `define` should have executed. 
 
 athena/require does not need to wait until the `load` event if it is told exactly when all modules have been defined. Calling `require.ready()` tells athena/require that all modules have been defined and it is safe to begin immediately servicing asynchronous `require` calls. By placing a call to `require.ready()` at the very end of the script (or even simply after the very last module definition), apparent page render performance can be drastically improved.
+
+### require config
+
+If the global variable `require` is set to an object before `require.js` appears in the script, that object will be the initial `config` for athena/require.
 
 ### warnings
 
@@ -65,6 +77,10 @@ athena/require does not need to wait until the `load` event if it is told exactl
 ## Author
 
 Raymond Lam (rlam@athenahealth.com)
+
+## Contributors
+
+- Edward Pastuszenski (epastuszenski@athenahealth.com)
 
 ## License
 
