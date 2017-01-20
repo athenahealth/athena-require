@@ -12,14 +12,6 @@
 // Global 'this', likely to be the _root object.
 var _root = this;
 
-// If we don't have a root object, we can't actually continue.
-if (!_root) {
-  if ((typeof console) !== 'undefined') {
-    console.warn('Could not initialize athena/require in this context.');
-  }
-  return;
-}
-
 // If a define is already present via another AMD loader or there is an existing
 // requirejs instance, do not overwrite.
 if (_root.define || _root.requirejs) {
