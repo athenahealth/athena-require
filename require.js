@@ -777,14 +777,20 @@ function _resolveTree(args) {
       // resolved module into the dependency list of the parent in the correct
       // position.
       var parentNode = currentNode.parentNode;
-      if (currentNode.parentNode) {
-        currentNode.parentNode.resolvedDependencies[currentNode.dependencyPosition] = _resolved[fullModulePath];
-        ++currentNode.parentNode.numberOfResolvedDependencies;
+      if (parentNode) {
+        parentNode.resolvedDependencies[currentNode.dependencyPosition] = _resolved[fullModulePath];
+        ++parentNode.numberOfResolvedDependencies;
+
+        // Conservative garbage collectors sometimes fail to collect objects
+        // which are collectable. If currentNode fails to be collected, better
+        // better to leak just currentNode rather than it and all of its
+        // parents, so dismantle the dependency tree on the way up.
+        delete currentNode.parentNode;
       }
 
       // The resolution of the currentNode might mean that the parent node can
       // also be resolved, so go up the dependency tree.
-      currentNode = currentNode.parentNode;
+      currentNode = parentNode;
     }
 
     // If we've traversed an unreasonable number of nodes, there's probably a cycle.
