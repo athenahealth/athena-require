@@ -1040,7 +1040,7 @@ QUnit.test('delayBetweenRequireCallbacks', function(assert) {
   });
 
   require(['12-a'], function() {
-    assert.ok(getNow() - time => 500, 'delay occurs before the following callback is called');
+    assert.ok(getNow() - time > 500, 'delay occurs before the following callback is called');
     ready();  
   });
 
