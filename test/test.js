@@ -29,7 +29,7 @@ QUnit.test('simple module, synchronous require', function(assert) { "use strict"
 QUnit.test('simple module, asynchronous require', function(assert) { "use strict";
   var ready = assert.async();
 
-  assert.expect(8);
+  assert.expect(9);
 
   var count = 0;
   define('1-0', function() {
@@ -41,33 +41,48 @@ QUnit.test('simple module, asynchronous require', function(assert) { "use strict
     return { biz: 'baz' };
   });
 
+  define('1-2', function() {
+    return { wiz: 'waz' };
+  });
+
   assert.strictEqual(count, 0, 'factory function not run before the first require');
 
   var m1;
   var m2;
+  var m3;
+  var m4;
   require([
     '1-0'
   ], function(
-    simpleModule1
+    dep0
   ) {
     assert.strictEqual(this, root, "this of require callback function is root context's this");
-    assert.deepEqual(simpleModule1, { foo: 'bar' }, 'correct value is passed to callback');
-    m1 = simpleModule1;
+    assert.deepEqual(dep0, { foo: 'bar' }, 'correct value is passed to callback');
+    m1 = dep0;
   });
 
   require([
     '1-0'
   ], function(
-    simpleModule1
+    dep0
   ) {
-    assert.strictEqual(simpleModule1, m1, 'strictly the same value is always given for a module');
-    m2 = simpleModule1;
+    assert.strictEqual(dep0, m1, 'strictly the same value is always given for a module');
+    m2 = dep0;
   });
 
-  require(['1-0', '1-1'], function(dep0, dep1) {
+  require(['1-1', '1-2'], function(dep0, dep1) {
+    assert.deepEqual(dep0, { biz: 'baz' }, 'can require more than one module');
+    m3 = dep0;
+  });
+  
+  require(['1-0', '1-2'], function(dep0, dep1) {
+    assert.strictEqual(dep0, m1, 'strictly the same value is always given more a module when multiple modules are required');
+    m4 = dep1;
+  }); 
+  
+  require(['1-0', '1-1', '1-2'], function(dep0, dep1) {
     assert.strictEqual(count, 1, 'factory function does not run more than once');
-    assert.ok(m1 && m2, 'when plugins are not involved, require callbacks are executed in order.');
-    assert.deepEqual(dep1, { biz: 'baz' }, 'can require more than one module');
+    assert.ok(m1 && m2 && m3 && m4, 'when plugins are not involved, require callbacks are executed in order.');
 
     ready();
   });
@@ -1025,7 +1040,7 @@ QUnit.test('delayBetweenRequireCallbacks', function(assert) {
   });
 
   require(['12-a'], function() {
-    assert.ok(getNow() - time >= 500, 'delay occurs before the following callback is called');
+    assert.ok(getNow() - time => 500, 'delay occurs before the following callback is called');
     ready();  
   });
 

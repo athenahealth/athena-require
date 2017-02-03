@@ -487,6 +487,18 @@ function _resolveTree(args) {
   if (args.resolveStack) {
     resolveStack = args.resolveStack;
   }
+  // If there's only one modulePath, and it is already resolved, short-circuit
+  // everything
+  else if (
+    args.modulePaths.length === 1
+    && _resolved.hasOwnProperty(args.modulePaths[0])
+  ) {
+    if (args.onSuccess) {
+      args.onSuccess();
+    }
+
+    return { success: true };
+  }
   // Start the DFS rooted at the passed in module paths
   else {
     resolveStack = [];
