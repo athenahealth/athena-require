@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/athenahealth/athena-require.svg?branch=master)](https://travis-ci.org/athenahealth/athena-require)
+
 # athena/require
 
 A fast [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) loader for use with compiled JavaScript as a replacement for [RequireJS](http://requirejs.org).
