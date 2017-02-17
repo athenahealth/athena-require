@@ -1032,7 +1032,7 @@ QUnit.test('delayBetweenRequireCallbacks', function(assert) {
   var time;
   var getNow = typeof performance !== 'undefined' && performance.now 
     ? performance.now.bind(performance)
-    : Date.now.bind(Date)
+    : function() { return (new Date()).getTime(); }
   ;
 
   require(['12-a'], function() {
