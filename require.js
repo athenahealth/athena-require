@@ -1,6 +1,6 @@
-//     athena/require
+//     athena/require 1.1.0
 //     https://github.com/athenahealth/athena-require
-//     (c) 2016 athenahealth, Inc.
+//     (c) 2016-2017 athenahealth, Inc.
 //
 //     Author: Raymond Lam (rlam@athenahealth.com)
 //
