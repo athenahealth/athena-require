@@ -372,7 +372,7 @@ function _onLoad(callback) {
     flushOnLoadCallbacks();
   }
   // If we are oddly in a situation where there is no document (like we're not a
-  // browser?), just flush the callbacks on defer.
+  // browser?), just defer flushing of the callbacks.
   else if (!_root.document) {
     setTimeout(flushOnLoadCallbacks, 0);
   }
@@ -473,7 +473,9 @@ function _require() {
 //   deferred: set to the full path of a dependency which could not be 
 //             immediately resolved. dependency tree resolution will 
 //             automatically continue where it left off when this
-//             module is available.
+//             module is available. This status is for when the dependency is
+//             actually a plugin invocation which is deferred and asynchronously
+//             executed.
 // }
 function _resolveTree(args) {
   var i;
@@ -593,18 +595,11 @@ function _resolveTree(args) {
       var plugin = _resolved[pluginPath];
       if (!plugin) {
 
-        // Resolve the plugin. Pass through the success handler, in case the
-        // resolution of the plugin is deferred.
+        // Resolve the plugin. We don't need to pass a success handler because
+	// we need the resolve to return sucess, or else we are just going to
+	// return immediately with non-success.
         var pluginStatus = _resolveTree({
-          modulePaths: [pluginPath],
-          onSuccess: function() {
-            if (pluginStatus && pluginStatus.deferred) {
-              _resolveTree({
-                resolveStack: resolveStack,
-                onSuccess: args.onSuccess
-              });
-            }
-          }
+          modulePaths: [pluginPath]
         });
 
         // If we've succeeded in resolving the plugin right away, we can
