@@ -74,12 +74,12 @@ QUnit.test('simple module, asynchronous require', function(assert) { "use strict
     assert.deepEqual(dep0, { biz: 'baz' }, 'can require more than one module');
     m3 = dep0;
   });
-  
+
   require(['1-0', '1-2'], function(dep0, dep1) {
     assert.strictEqual(dep0, m1, 'strictly the same value is always given more a module when multiple modules are required');
     m4 = dep1;
-  }); 
-  
+  });
+
   require(['1-0', '1-1', '1-2'], function(dep0, dep1) {
     assert.strictEqual(count, 1, 'factory function does not run more than once');
     assert.ok(m1 && m2 && m3 && m4, 'when plugins are not involved, require callbacks are executed in order.');
@@ -142,7 +142,7 @@ QUnit.test('relative paths', function(assert) { "use strict";
   ) {
     assert.strictEqual(dep0, '3-a/b/d', 'relative to current path');
     assert.strictEqual(dep1, '3-a/e', 'relative to parent path');
-  
+
     return '3-a/b/c';
   });
 
@@ -200,7 +200,7 @@ QUnit.test('relative paths', function(assert) { "use strict";
   });
 
   require('3-a/b/i');
-  
+
   assert.deepEqual(
     counts0,
     {
@@ -266,7 +266,7 @@ QUnit.test('relative paths', function(assert) { "use strict";
   });
 
   require('3-j/k/m');
-  
+
   assert.deepEqual(
     counts1,
     {
@@ -296,7 +296,7 @@ QUnit.test('plugins', function(assert) { "use strict";
         assert.strictEqual(config, req.config(), 'configuration is passed into load');
         onLoad({ name: name, pluginApplied: true });
       }
-    }; 
+    };
   });
 
   define('4-a/b', function() {
@@ -304,11 +304,11 @@ QUnit.test('plugins', function(assert) { "use strict";
   });
 
   var plugin0OnAB = require('4-plugin-0!4-a/b');
-  
+
   assert.deepEqual(plugin0OnAB, { name: '4-a/b', pluginApplied: true }, 'plugin applied correctly');
   assert.strictEqual(require('4-plugin-0!4-a/b'), plugin0OnAB, 'identical plugin invocation returns strictly the same value');
   assert.strictEqual(count0, 1, 'identical plugin invocation does not run load function again');
-  
+
   define('4-a/c', [
     '4-plugin-0!./b'
   ], function(
@@ -357,7 +357,7 @@ QUnit.test('plugins', function(assert) { "use strict";
       normalize: function(name, normalize) {
         ++count2Normalize;
         assert.strictEqual(name, plugin2Arg, 'module name ' + plugin2Arg + ' currently passed through to normalize');
-        
+
         var normalized = normalize(name);
         assert.strictEqual(normalized, '4-g/i', plugin2Arg + ' correctly normalizes');
         return normalized + '-foo';
@@ -452,7 +452,7 @@ QUnit.test('plugins', function(assert) { "use strict";
 
   assert.strictEqual(count4Plugin, 1, 'when a plugin is referenced by absolute path, and then by relative path, and the target is different, the factory function for the plugin should not be run again.');
   assert.strictEqual(count4, 2, 'when a plugin is referenced by absolute path, and then by relative path, and the target is different, the load function should be run again.');
-  
+
   /**********/
 
   var ready = assert.async();
@@ -495,7 +495,7 @@ QUnit.test('plugins', function(assert) { "use strict";
 
   require(['4-s'], function(result) {
     assert.strictEqual(result, '4-t-barbar:4-v-barbar', 'asynchronous plugin');
-    
+
     ready();
   });
 
@@ -582,7 +582,7 @@ QUnit.test('require, module and exports', function(assert) {
     assert.strictEqual(module.id, '5-a/b/e', 'module.id is the full module path even if it is refered to by a relative-to-current-module path');
     module.exports.exportedByModule = 'fooE';
   });
-  
+
   define('5-a/f', [
     'module'
   ], function(
@@ -601,7 +601,7 @@ QUnit.test('require, module and exports', function(assert) {
     'exports'
   ], function(
     exports
-  ) { 
+  ) {
     exports.exportsForG = 'g';
   });
 
@@ -757,12 +757,12 @@ QUnit.test('require.ready()', function(assert) { "use strict";
 
   var modCount = 0;
   var count = 0;
-  
+
   define('6-a', function() {
     ++modCount;
     return {};
   });
-  
+
   require(['6-a'], function() {
    ++count;
   });
@@ -776,7 +776,7 @@ QUnit.test('require.ready()', function(assert) { "use strict";
 
 QUnit.test('define', function(assert) { "use strict";
   assert.expect(6);
-  
+
   assert.deepEqual(define.amd, { athena: true }, 'define.amd');
 
   define('7-a', function() {
@@ -802,11 +802,11 @@ QUnit.test('define', function(assert) { "use strict";
   });
 
   define('7-d', function() {
-    return {};  
+    return {};
   });
-  
+
   define('7-e', function() {
-    return {};  
+    return {};
   });
 
   require('7-c');
@@ -829,7 +829,7 @@ QUnit.test('module timings', function(assert) { "use strict";
   assert.expect(3);
 
   require.config({ moduleTimingThreshold: 0.0 });
-  
+
   define('8-a', function() {
     for (var i = 0; i < 10000000; ++i) {}
 
@@ -854,7 +854,7 @@ QUnit.test('module timings', function(assert) { "use strict";
 
   var stoppedTimings = require.stopTimer();
   assert.strictEqual(timings, stoppedTimings, 'require.stopTimer() returns the timings object');
-  
+
   require('8-b');
 
   timings = require.getTimes();
@@ -869,13 +869,13 @@ QUnit.test('dependency tree', function(assert) { "use strict";
   assert.expect(2);
 
   var counts = {};
-  
+
   define('9-a/i', function() {
     counts['9-a/i'] = counts['9-a/i']  || 0;
     ++counts['9-a/i'];
     return '9-a/i';
   });
-  
+
   require('9-a/i'); // resolve this module for later use
 
   define('9-a/j', [
@@ -885,13 +885,13 @@ QUnit.test('dependency tree', function(assert) { "use strict";
     ++counts['9-a/j'];
     return Array.prototype.join.call(arguments,':');
   });
-  
+
   define('9-a/k', function() {
     counts['9-a/k'] = counts['9-a/k']  || 0;
     ++counts['9-a/k'];
     return '9-a/k';
-  }); 
-  
+  });
+
   require('9-a/j'); // resolve this module for later use
 
   define('9-a/b', [
@@ -947,13 +947,13 @@ QUnit.test('dependency tree', function(assert) { "use strict";
     ++counts['9-a/f'];
     return dep0 + ':' + dep2;
   });
-  
+
   define('9-a/g', function() {
     counts['9-a/g'] = counts['9-a/g']  || 0;
     ++counts['9-a/g'];
     return '9-a/g';
   });
-  
+
   define('9-a/h', function() {
     counts['9-a/h'] = counts['9-a/h']  || 0;
     ++counts['9-a/h'];
@@ -1030,7 +1030,7 @@ QUnit.test('delayBetweenRequireCallbacks', function(assert) {
   require.config({ delayBetweenRequireCallbacks: 500 });
 
   var time;
-  var getNow = typeof performance !== 'undefined' && performance.now 
+  var getNow = typeof performance !== 'undefined' && performance.now
     ? performance.now.bind(performance)
     : function() { return (new Date()).getTime(); }
   ;
@@ -1041,7 +1041,7 @@ QUnit.test('delayBetweenRequireCallbacks', function(assert) {
 
   require(['12-a'], function() {
     assert.ok(getNow() - time > 500, 'delay occurs before the following callback is called');
-    ready();  
+    ready();
   });
 
   require.ready();

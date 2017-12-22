@@ -9,7 +9,8 @@
 
 (function(undefined) { "use strict";
 
-// Global 'this', likely to be the _root object.
+// The 'root' object, which is the global this (which is window in the context
+// of the browser).
 var _root = this;
 
 // If a define is already present via another AMD loader or there is an existing
@@ -18,7 +19,7 @@ if (_root.define || _root.requirejs) {
   return;
 }
 
-// If we have to traverse this many nodes in a dependency tree, assume it has a 
+// If we have to traverse this many nodes in a dependency tree, assume it has a
 // cycle, and abort.
 var MAX_TRAVERSAL = 1000000;
 
@@ -29,13 +30,15 @@ var _configuration = {
   onReady: undefined, // If set, called after require is ready
                       // and has handled all queued callbacks.
 
-  recordModuleTimes: true,
-  
+  recordModuleTimes: true,  // Record time it takes to build modules if true.
+
   recordModuleTimeThreshold: 5.0, // Record timing for construction time of
                                   // individual module only if the time exceeds
-                                  // this many milliseconds. (The individual time
-                                  // will always be added to the totalModuleTime.)
-  warnings: true
+                                  // this many milliseconds. (The individual
+                                  // time will always be added to the
+                                  // totalModuleTime.)
+
+  warnings: true // Suppress console warnings if false.
 };
 
 // true if all of the defines on the page have had a chance to execute.
@@ -102,8 +105,8 @@ var _moduleTimes = {
 };
 
 // Given a string that looks like a path to the module, returns the portion
-// of the path that represents the 'directory' that contains the module. For 
-// example, given 'path/to/some/module', returns 'path/to/some'. Given 
+// of the path that represents the 'directory' that contains the module. For
+// example, given 'path/to/some/module', returns 'path/to/some'. Given
 // 'my-module', returns an empty string
 var _dirName = (function() {
   var cache = {};
@@ -125,7 +128,7 @@ var _dirName = (function() {
   };
 })();
 
-// Sets a parameter in athena/require's configuration. 
+// Sets a parameter in athena/require's configuration.
 function _config(args) {
   if (args) {
     for (var key in args) {
@@ -177,7 +180,7 @@ function _define() {
   else if (arguments.length === 1) {
     if ((typeof arguments[0]) === 'function') {
       _warn(anonymousWarning);
-      return;  
+      return;
     }
   }
 
@@ -191,9 +194,9 @@ function _define() {
       Object.prototype.toString.call(moduleName) === '[object String]'
       && Object.prototype.toString.call(dependencies) === '[object Array]'
       && (typeof factory) === 'function'
-    ) 
+    )
   ) {
-    throw new Error('Invalid arguments.');  
+    throw new Error('Invalid arguments.');
   }
 
   if (_moduleMap.hasOwnProperty(moduleName)) {
@@ -233,7 +236,7 @@ function _flushNextTickCallbacks() {
         _nextTickCallbacks.push(callback);
         return;
       }
-      
+
       // If a require callback delay is configured, relinquish
       // control of the JS thread and continue later.
       if (
@@ -264,7 +267,7 @@ function _flushNextTickCallbacks() {
 //   modules: {
 //     'my/module' : {
 //      ordering: in what order this module was resolved
-//      time: number of millisconds spent building this module
+//      time: number of milliseconds spent building this module
 //            (not including dependencies).
 //    },
 //    'my/other/module' : { ... },
@@ -275,17 +278,16 @@ function _getModuleTimes() {
   return _moduleTimes;
 }
 
-// If _root.performance is available, returns the time since epoch to microsecond
-// precision. Otherwise, returns the time since epoch to millisecond accuracy,
-// with no guarantee of monotonicity.
-var _getNow = (_root.performance && _root.performance.now 
+// If _root.performance is available, returns the time since epoch to
+// microsecond. precision. Otherwise, returns the time since epoch to
+// millisecond precision, with no guarantee of monotonicity.
+var _getNow = (_root.performance && _root.performance.now
   ? _root.performance.now.bind(_root.performance)
-  : function() { 
+  : function() {
     return (new Date().getTime());
   }
 );
 
-  
 // Given a module path, if it is a relative module path, returns the
 // absolute form of the relative path given another module path. Otherwise
 // simply returns that module path.
@@ -326,6 +328,9 @@ function _normalizeModulePath(modulePath, relativeToModulePath) {
 // false if it executed unsuccessfully but non-fatally and should be put
 // back in the queue in front to be tried again later.
 function _nextTick(func) {
+  // If _nextTickCallbacks is populated, we don't need to setTimeout,
+  // because _nextTickCallbacks being populated means we already invoked
+  // a setTimeout.
   if (!_nextTickCallbacks.length) {
     setTimeout(_flushNextTickCallbacks, 0);
   }
@@ -335,7 +340,7 @@ function _nextTick(func) {
 
 // Execute the given callback when the 'load' event fires on the _root,
 // or immediately if the document's readyState is 'complete'.
-function _onLoad(callback) {  
+function _onLoad(callback) {
   var flushOnLoadCallbacks = function() {
     while (_onLoadCallbacks.length) {
       _onLoadCallbacks.pop()();
@@ -343,12 +348,13 @@ function _onLoad(callback) {
   };
 
   if (
-    !_onLoadCallbacks.length // If we have onLoad callbacks queued, it means that
-                             // we've already called _onLoad before the document
-                             // was complete, which means that we already have
-                             // the load handlers attached to flush the call backs,
-                             // so we don't need to attach the load handlers again.
-    
+    !_onLoadCallbacks.length // If we have onLoad callbacks queued, it means
+                             // that we've already called _onLoad before the
+                             // document was complete, which means that we
+                             // already have the load handlers attached to flush
+                             // the call backs, so we don't need to attach the
+                             // load handlers again.
+
     && _root.document // Attaching load handlers only really makes sense where
                       // we are in a browser context with a document.
 
@@ -379,7 +385,7 @@ function _onLoad(callback) {
 
 }
 
-// Sets _isReady to true and flushes the next tick callback queue. When 
+// Sets _isReady to true and flushes the next tick callback queue. When
 // _isReady is false and a module is not found, it is assumed that all the
 // defines have not yet had a chance to execute, and pending resolutions
 // waiting on the module should wait until _ready() is invoked (either
@@ -391,7 +397,7 @@ function _ready() {
 }
 
 // If given a module name as its only argument, resolves that module and
-// returns it. If given as arguments an array of module names and a 
+// returns it. If given as arguments an array of module names and a
 // callback function, asynchronously resolves all of the modules, and then
 // calls the callback function with the resolved modules as arguments in order.
 function _require() {
@@ -410,7 +416,7 @@ function _require() {
   else if (arguments.length === 2) {
     var modulePaths = arguments[0];
     var callback = arguments[1];
-    
+
     // asynchronous require call -- wait until the next tick, when
     // in theory all of the defines on the have executed, before
     // executing the given callback.
@@ -431,8 +437,8 @@ function _require() {
       if (resolveStatus.success || resolveStatus.deferred) {
         return true;
       }
-      // If all modules have been defined and we can't find the one we're looking
-      // for, throw an error.
+      // If all modules have been defined and we can't find the one we're
+      // looking for, throw an error.
       else if (_isReady && resolveStatus.moduleNotDefined) {
         _throwResolveError(resolveStatus);
       }
@@ -451,15 +457,15 @@ function _require() {
 
 // Resolves the dependency tree of the given modules. Takes an args object:
 // {
-//  modulePaths: an array to the paths of modules whose dependency trees are to be
-//               resolved,
+//  modulePaths: an array to the paths of modules whose dependency trees are to
+//               be resolved,
 //
-//  resolveStack: alternative to modulePaths. pass in a resolve stack in order to
-//                have _resolveTree continue resolving a dependency tree given
-//                the state of the stack.
+//  resolveStack: alternative to modulePaths. pass in a resolve stack in order
+//                to have _resolveTree continue resolving a dependency tree
+//                given the state of the stack.
 //
-//  onSuccess: a function to execute when the dependency tree has been successfully
-//             resolved.
+//  onSuccess: a function to execute when the dependency tree has been
+//             successfully resolved.
 //
 // }
 //
@@ -470,8 +476,8 @@ function _require() {
 //   moduleNotDefined: set to the full path of a module which has not (yet) been
 //                     defined,
 //
-//   deferred: set to the full path of a dependency which could not be 
-//             immediately resolved. dependency tree resolution will 
+//   deferred: set to the full path of a dependency which could not be
+//             immediately resolved. dependency tree resolution will
 //             automatically continue where it left off when this
 //             module is available. This status is for when the dependency is
 //             actually a plugin invocation which is deferred and asynchronously
@@ -480,7 +486,7 @@ function _require() {
 function _resolveTree(args) {
   var i;
   var resolveStack;
-  
+
   // The general algorithm for module resolution is a DFS tree-traversal, iteratively
   // using a stack.
 
@@ -527,7 +533,8 @@ function _resolveTree(args) {
     // ! indicates the invocation of a plugin.
     var bangIndex;
 
-    // Will be true if currentNode.modulePath is an exact match for an entry in _moduleMap.
+    // Will be true if currentNode.modulePath is an exact match for an entry in
+    // _moduleMap.
     var modulePathIsExactMatch;
 
     // If the given module path matches exactly to a resolved module, we can
@@ -535,7 +542,8 @@ function _resolveTree(args) {
     if (_resolved.hasOwnProperty(currentNode.modulePath)) {
       currentNode.fullModulePath = currentNode.modulePath;
 
-      // The module is already resolved, so there are no dependencies that need resolving.
+      // The module is already resolved, so there are no dependencies that need
+      // resolving.
       currentNode.numberOfDependencies = 0;
     }
     // It is possible to hit this branch due to a previous invocation of
@@ -544,8 +552,9 @@ function _resolveTree(args) {
         currentNode.fullModulePath
         && _resolved.hasOwnProperty(currentNode.fullModulePath)
     ) {
-      
-      // The module is already resolved, so there are no dependencies that need resolving.
+
+      // The module is already resolved, so there are no dependencies that need
+      // resolving.
       currentNode.numberOfDependencies = 0;
     }
     // if ordinary module dependency (i.e., not a plugin invocation)
@@ -559,7 +568,7 @@ function _resolveTree(args) {
     ) {
       // Normalize the module path to its full module path. We will from now on
       // only be referring to the module by its full path.
-      
+
       // Don't bother checking to see if we need to normalize the module path
       // if the module path is an exact match for a module definition.
       if (!modulePathIsExactMatch && currentNode.modulePath.charAt(0) === '.') {
@@ -584,8 +593,8 @@ function _resolveTree(args) {
 
       // Always normalize the plugin path.
       if (pluginPath.charAt(0) === '.') {
-        pluginPath = _normalizeModulePath(pluginPath, currentNode.parentNode 
-          ? currentNode.parentNode.fullModulePath 
+        pluginPath = _normalizeModulePath(pluginPath, currentNode.parentNode
+          ? currentNode.parentNode.fullModulePath
           : ''
         );
       }
@@ -596,8 +605,8 @@ function _resolveTree(args) {
       if (!plugin) {
 
         // Resolve the plugin. We don't need to pass a success handler because
-	// we need the resolve to return sucess, or else we are just going to
-	// return immediately with non-success.
+        // we need the resolve to return sucess, or else we are just going to
+        // return immediately with non-success.
         var pluginStatus = _resolveTree({
           modulePaths: [pluginPath]
         });
@@ -613,8 +622,9 @@ function _resolveTree(args) {
         }
       }
 
-      // If the plugin has a normalize function, apply it to the plugin argument,
-      // which needs to be normalized using the built-in normalizer first.
+      // If the plugin has a normalize function, apply it to the plugin
+      // argument,which needs to be normalized using the built-in normalizer
+      // first.
       if (plugin.normalize) {
         pluginArg = plugin.normalize(pluginArg, function(arg) {
           if (arg.charAt(0) === '.') {
@@ -629,11 +639,11 @@ function _resolveTree(args) {
       else if (pluginArg.charAt(0) === '.') {
         pluginArg = _normalizeModulePath(pluginArg, currentNode.parentNode ? currentNode.parentNode.fullModulePath : '');
       }
- 
+
       // fullModulePath is both normalized paths separated by a !. This is how
       // the result of the plugin invocation will be stored in _resolved.
       currentNode.fullModulePath = pluginPath + '!' + pluginArg;
-      
+
       // Plugin invocations never have dependencies directly.
       currentNode.numberOfDependencies = 0;
 
@@ -643,14 +653,14 @@ function _resolveTree(args) {
 
         var pluginLoadIsSynchronous = true;
         plugin.load(pluginArg, _require, function(result) {
-          
+
           // Store the result of the plugin invocation by the
           // normalized paths.
           _resolved[currentNode.fullModulePath] = result;
           ++_resolvedModuleCount;
 
           // If the plugin is applied immediately and synchronously,
-          // pluginLoadIsSynchronous will still be tree by the time
+          // pluginLoadIsSynchronous will still be true by the time
           // we reach this line. If pluginLoadIsSynchronous is false,
           // then that means we are executing this line at some point
           // after the outer _resolveTree call has already returned
@@ -684,25 +694,26 @@ function _resolveTree(args) {
 
     // By this point, currentNode must have a fullModulePath.
     if (_resolved.hasOwnProperty(currentNode.fullModulePath)) {
-      // The module is already resolved, so there are no dependencies that need resolving.
+      // The module is already resolved, so there are no dependencies that need
+      // resolving.
       currentNode.numberOfDependencies = 0;
     }
     else {
       currentNode.factory = _moduleMap[currentNode.fullModulePath].factory;
       currentNode.numberOfDependencies = _moduleMap[currentNode.fullModulePath].dependencies.length;
 
-      // Pre-sized array, which will be filled with resolved dependencies, in the
-      // order that they were injected in the define statement.
+      // Pre-sized array, which will be filled with resolved dependencies, in
+      // the order that they were injected in the define statement.
       currentNode.resolvedDependencies = new Array(currentNode.numberOfDependencies);
 
       currentNode.numberOfResolvedDependencies = 0;
 
-      // The fastest way to loop though an array is backwards, using the decrement
-      // operator
+      // The fastest way to loop though an array is backwards, using the
+      // decrement operator
       i = currentNode.numberOfDependencies;
       while (i--) {
         var dependencyString = _moduleMap[currentNode.fullModulePath].dependencies[i];
-        
+
         // If the dependency is already resolved, simply put it into our list
         // of resolved dependencies.
         if (_resolved.hasOwnProperty(dependencyString)) {
@@ -714,10 +725,10 @@ function _resolveTree(args) {
           dependencyString === 'module'
           || dependencyString === 'exports'
         ) {
-          
+
           currentNode.commonJS = currentNode.commonJS || {
             id: currentNode.fullModulePath,
-            exports: {} 
+            exports: {}
           };
 
           currentNode.resolvedDependencies[i] = (dependencyString === 'module'
@@ -729,13 +740,14 @@ function _resolveTree(args) {
         }
         // Else, the dependency may or may not be resolved already.
         else {
-          
+
           // Push the node onto the resolve stack for traversal. If it turns out
-          // that the dependencyString is a relative module path, and we actually
-          // have already resolved it, we will discover this at the top of this
-          // loop when we pop the node and normalize the modulePath. Make sure
-          // this child node has a link back to the parent (the current node),
-          // and that it knows its position in the current node's list of dependencies.
+          // that the dependencyString is a relative module path, and we
+          // actually have already resolved it, we will discover this at the top
+          // of this loop when we pop the node and normalize the modulePath.
+          // Make sure this child node has a link back to the parent (the
+          // current node),and that it knows its position in the current node's
+          // list of dependencies.
           resolveStack.push({
             modulePath: dependencyString,
             parentNode: currentNode,
@@ -745,16 +757,17 @@ function _resolveTree(args) {
       }
     }
 
-    // If all of the the current node's are resolved... 
+    // If all of the the current node's are resolved...
     while (
-      currentNode 
+      currentNode
       && (currentNode.numberOfResolvedDependencies || 0) === currentNode.numberOfDependencies
     ) {
-      // By this point, currentNode must have a at a minimum modulePath, factory,
-      // fullModulePath, resolvedDependencies, and numberOfDependencies defined.
-      // If currentNode has a parentNode, it must also have a dependencyPosition.
+      // By this point, currentNode must have a at a minimum modulePath,
+      // factory, fullModulePath, resolvedDependencies, and numberOfDependencies
+      // defined.If currentNode has a parentNode, it must also have a
+      // dependencyPosition.
       var fullModulePath = currentNode.fullModulePath;
-      
+
       // Only resolve the module once.
       if (!_resolved.hasOwnProperty(fullModulePath)) {
         var startTime = _getNow();
@@ -774,7 +787,8 @@ function _resolveTree(args) {
           }
         }
 
-        // Apply the CommonJS style exports only if there is no return from the factory.
+        // Apply the CommonJS style exports only if there is no return from the
+        // factory.
         if ((typeof _resolved[fullModulePath]) === 'undefined' && currentNode.commonJS) {
           _resolved[fullModulePath] = currentNode.commonJS.exports;
         }
@@ -800,14 +814,15 @@ function _resolveTree(args) {
       currentNode = parentNode;
     }
 
-    // If we've traversed an unreasonable number of nodes, there's probably a cycle.
+    // If we've traversed an unreasonable number of nodes, there's probably a
+    // cycle.
     if (++numberOfTraversedNodes > MAX_TRAVERSAL) {
       throw new Error(
-        'Traversed too many nodes in the dependency tree. Possible cycle at module ' 
+        'Traversed too many nodes in the dependency tree. Possible cycle at module '
         + (currentNode.fullModulePath || currentNode.modulePath)
         + ' or at a related module.'
       );
-    }    
+    }
   }
 
   // If we get this far, the dependency resolution was a complete success.
@@ -828,7 +843,7 @@ function _stopTimer () {
 // Throws an error with consistent messenging. Takes as its output the return of
 // _resolveTree
 function _throwResolveError(resolveStatus) {
-  if (resolveStatus.moduleNotDefined) {  
+  if (resolveStatus.moduleNotDefined) {
     throw new Error(
       'Module '
       + resolveStatus.moduleNotDefined
@@ -851,9 +866,9 @@ function _throwResolveError(resolveStatus) {
 }
 
 // A minimal implementation of require.toUrl, because athena/require is designed
-// to work in compiled JavaScript, so turning module paths into URLs for the most
-// part makes no sense. Simply returns the given path plus the '.js' extension
-// if there does not appear to be an extension.
+// to work in compiled JavaScript, so turning module paths into URLs for the
+// most part makes no sense. Simply returns the given path plus the '.js'
+// extension if there does not appear to be an extension.
 function _toUrl(modulePath) {
   var match = modulePath.match(/\.[^\/]+$/);
   if (match) {
@@ -889,18 +904,19 @@ _root.requirejs = _root.require;
 // Expose the resolved module registry
 _root.require._resolved = _resolved;
 
-// Mark define as the AMD define, specifying that this is the Athena flavor of AMD.
+// Mark define as the AMD define, specifying that this is the Athena flavor of
+// AMD.
 _root.define.amd = {
-  athena: true  
+  athena: true
 };
 
 // when the page is fully loaded, all defines should have executed, so indicate
 // that we are ready
 _onLoad(_ready);
 
+// Make require available as a module..
 _define('require', function() {
   return _require;
 });
 
 }).call(this); // Pass _root or whatever 'this' is into the IIFE
-
