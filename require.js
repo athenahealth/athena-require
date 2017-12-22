@@ -1,4 +1,4 @@
-//     athena/require 1.1.0
+//     athena/require 1.1.1
 //     https://github.com/athenahealth/athena-require
 //     (c) 2016-2017 athenahealth, Inc.
 //
