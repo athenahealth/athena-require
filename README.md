@@ -2,11 +2,11 @@
 
 # athena/require
 
-A fast [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) loader for use with compiled JavaScript as a replacement for [RequireJS](http://requirejs.org).
+A fast [AMD](https://github.com/amdjs/amdjs-api/wiki/AMD) loader for use with bundled/compiled JavaScript as a replacement for [RequireJS](http://requirejs.org).
 
 ## Usage
 
-athena/require is to be used with compiled JavaScript, where the modules are explicitly named and defined inline. [r.js](http://requirejs.org/docs/optimization.html) is an example of JavaScript compiler that will build, bundle, and explicitly name AMD modules.
+athena/require is to be used with bundled/compiled JavaScript, where the modules are explicitly named and defined inline. [r.js](http://requirejs.org/docs/optimization.html) is an example of JavaScript bundler/compiler that will build, bundle, and explicitly name AMD modules.
 
 ## Motivation
 
