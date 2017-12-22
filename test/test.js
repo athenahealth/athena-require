@@ -1055,7 +1055,7 @@ QUnit.test('onReady', function(assert) { "use strict";
   require.ready();
 
   assert.ok(root.onReadyThis, 'onReady callback is called after ready');
-  assert.ok(root.onReadyThis, root, "this of onReady callback is the root context's this");
+  assert.strictEqual(root.onReadyThis, root, "this of onReady callback is the root context's this");
 });
 
 QUnit.test('require.config()', function(assert) { "use strict";
