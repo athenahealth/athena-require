@@ -413,9 +413,10 @@ function _require() {
       _throwResolveError(resolveStatus);
     }
   }
-  else if (arguments.length === 2) {
+  else if (arguments.length <= 3) {
     var modulePaths = arguments[0];
     var callback = arguments[1];
+    var errorCallback = arguments[2];
 
     // asynchronous require call -- wait until the next tick, when
     // in theory all of the defines on the have executed, before
@@ -440,7 +441,13 @@ function _require() {
       // If all modules have been defined and we can't find the one we're
       // looking for, throw an error.
       else if (_isReady && resolveStatus.moduleNotDefined) {
-        _throwResolveError(resolveStatus);
+        if (errorCallback) {
+          errorCallback(_getResolveError(resolveStatus));
+          return true;
+        }
+        else {
+          _throwResolveError(resolveStatus);
+        }
       }
       // If all modules have not yet been defined, and the resolve status is
       // something other than success or deferred, return false to put this
@@ -840,11 +847,16 @@ function _stopTimer () {
   return _getModuleTimes();
 }
 
-// Throws an error with consistent messenging. Takes as its output the return of
+// Throws an error with consistent messaging. Takes as its output the return of
 // _resolveTree
 function _throwResolveError(resolveStatus) {
+  throw new Error(_getResolveError(resolveStatus))
+}
+
+// Gets the message for a resolve error, but does not throw it.
+function _getResolveError(resolveStatus) {
   if (resolveStatus.moduleNotDefined) {
-    throw new Error(
+    return (
       'Module '
       + resolveStatus.moduleNotDefined
       + ' or one of its dependencies is not '
@@ -856,12 +868,10 @@ function _throwResolveError(resolveStatus) {
     );
   }
   else if (resolveStatus.deferred) {
-    throw new Error (resolveStatus.deferred + ' is not yet ready.');
+    return resolveStatus.deferred + ' is not yet ready.';
   }
   else {
-    throw new Error(
-      'Unknown error: ' + JSON.stringify(resolveStatus)
-    );
+    return 'Unknown error: ' + JSON.stringify(resolveStatus);
   }
 }
 

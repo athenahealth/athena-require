@@ -1049,6 +1049,42 @@ QUnit.test('delayBetweenRequireCallbacks', function(assert) {
 
 });
 
+
+QUnit.test('asynchronous require with error callback', function(assert) { "use strict";
+  var ready = assert.async();
+
+  require([
+    '13-a'
+  ], function() {
+    assert.ok(0, 'no error was thrown')
+  }, function(error) {
+    assert.strictEqual(
+      error, 
+      'Module 13-a or one of its dependencies is not defined.',
+      'error is passed to the error callback'
+    );
+  });
+
+  // Force resolution of the above require, otherwise the
+  // define below will happen first.
+  require.ready();
+
+  define('13-a', function() {
+    return '13-a';
+  });
+
+  require([
+    '13-a'
+  ], function(dep) {
+    assert.strictEqual(dep, '13-a', 'module can be defined later');
+    ready();
+  }, function() {
+    assert.ok(0, "an error was passed to the error callback");
+    ready();
+  });
+
+});
+
 QUnit.test('onReady', function(assert) { "use strict";
   assert.expect(2);
 
@@ -1076,3 +1112,5 @@ QUnit.test('requirejs', function(assert) { "use strict";
   assert.strictEqual(requirejs, require, 'requirejs is the same as require');
 
 });
+
+
