@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/athenahealth/athena-require.svg?branch=master)](https://travis-ci.org/athenahealth/athena-require)
+[![Build Status](https://travis-ci.com/athenahealth/athena-require.svg?branch=master)](https://travis-ci.com/athenahealth/athena-require)
 
 # athena/require
 
