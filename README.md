@@ -76,6 +76,18 @@ If the global variable `require` is set to an object before `require.js` appears
 
 `require.config({ warnings: false });` to disable console warnings.
 
+### error callback
+
+When using the asynchronous form of `require`, you can pass a third argument which will be treated as an error callback. This can be useful when converting an asynchronous require call to a promise:
+
+    return new Promise((resolve, reject) => {
+      require(['moduleName'], resolve, reject);
+    }));
+
+In fact, this is how Typescript and Babel compile asynchronous imports when targeting AMD modules.
+
+When an error handler is present, what would have once been a fatal error while resolving modules will now instead allow module resolution to continue. Your error handler can then throw an exception if the caught error is truly unrecoverable.
+
 ## Author
 
 Raymond Lam (rlam@athenahealth.com)
@@ -83,6 +95,7 @@ Raymond Lam (rlam@athenahealth.com)
 ## Contributors
 
 - Edward Pastuszenski (epastuszenski@athenahealth.com)
+- Andrew Harris (anharris@athenahealth.com)
 
 ## License
 
