@@ -442,7 +442,7 @@ function _require() {
       // looking for, throw an error.
       else if (_isReady && resolveStatus.moduleNotDefined) {
         if (errorCallback) {
-          errorCallback(_getResolveError(resolveStatus));
+          errorCallback(_getResolveErrorMessage(resolveStatus));
           return true;
         }
         else {
@@ -850,11 +850,11 @@ function _stopTimer () {
 // Throws an error with consistent messaging. Takes as its output the return of
 // _resolveTree
 function _throwResolveError(resolveStatus) {
-  throw new Error(_getResolveError(resolveStatus))
+  throw new Error(_getResolveErrorMessage(resolveStatus))
 }
 
 // Gets the message for a resolve error, but does not throw it.
-function _getResolveError(resolveStatus) {
+function _getResolveErrorMessage(resolveStatus) {
   if (resolveStatus.moduleNotDefined) {
     return (
       'Module '
